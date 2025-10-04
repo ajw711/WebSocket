@@ -36,7 +36,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 Claims claims = jwtUtil.parseAndValidateToken(token);
 
                 Long memberId = jwtUtil.getMemberId(claims);
-                String tokenType = jwtUtil.getTokenType(claims).name();
                 Collection<? extends GrantedAuthority> authorities = jwtUtil.getAuthorities(claims);
 
                 if (jwtUtil.getTokenType(claims) == JwtUtil.TokenType.ACCESS_TOKEN) {

@@ -53,4 +53,8 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true; // 활성화됨
     }
+
+    public Long getMemberId() {
+        return member.getId();
+    }
 }
