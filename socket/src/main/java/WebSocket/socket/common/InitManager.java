@@ -19,17 +19,16 @@ public class InitManager {
 
     private final MemberRepository memberRepository;
 
-    // 💡 순환 참조 회피를 위해 필드 주입으로 변경
+    // 순환 참조 회피를 위해 필드 주입으로 변경
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @PostConstruct
-    @Transactional // 2. 데이터베이스 저장이 커밋되도록 트랜잭션 적용
+    @Transactional
     public void init() {
-        // 이미 데이터가 있다면 중복 생성을 피하기 위해 확인하는 것이 좋습니다.
+
         if (memberRepository.findByEmail("test@test.com").isEmpty()) {
 
-            // Member.createMember는 Member 엔티티를 생성하는 팩토리 메서드라고 가정합니다.
             Member newMember = Member.createMember(
                     "홍길동",
                     "test@test.com",
