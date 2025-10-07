@@ -28,13 +28,6 @@ public class ChatController {
         log.info("sendMessage = {} ", message.getMessage());
         // Principal을 통해 인증 정보에 접근
         Principal principal = headerAccessor.getUser();
-        if (principal != null) {
-            String memberId = principal.getName();
-            // ... 메시지 처리 로직
-        } else {
-            // 이 로그는 더 이상 발생하지 않습니다.
-            log.warn("인증 정보가 없습니다.");
-        }
         chatService.saveMessage(Long.parseLong(principal.getName()), message);
     }
 }
