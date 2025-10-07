@@ -36,5 +36,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureClientInboundChannel(ChannelRegistration registration) {
         // 클라이언트로부터 들어오는 메시지 채널에 인증 인터셉터를 추가
         registration.interceptors(stompHandler);
+        registration.taskExecutor().corePoolSize(4).maxPoolSize(8);
     }
 }
