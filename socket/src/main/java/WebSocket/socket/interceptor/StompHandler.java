@@ -1,5 +1,6 @@
 package WebSocket.socket.interceptor;
 
+import WebSocket.socket.common.SessionManager;
 import WebSocket.socket.entity.Member;
 import WebSocket.socket.jwt.JwtUtil;
 import WebSocket.socket.repository.MemberRepository;
@@ -29,6 +30,7 @@ import java.util.List;
 public class StompHandler implements ChannelInterceptor {
 
     private final JwtUtil jwtUtil;
+    private final SessionManager sessionManager;
     private final MemberRepository memberRepository;
 
 
@@ -72,6 +74,10 @@ public class StompHandler implements ChannelInterceptor {
                     accessor.setUser(authentication);
                     // (선택) SecurityContext에도 저장 (필요한 경우)
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    // 세션 정보 추출
+                    String sessionId = accessor.getSessionId();
+                    sessionManager.saveSession(sessionId, memberId.toString());
 
                 } catch (JwtUtil.ExpiredTokenException | JwtUtil.NotValidTokenException e) {
                     log.error("STOMP 연결 실패: 유효하지 않은 JWT 또는 만료: {}", e.getMessage());

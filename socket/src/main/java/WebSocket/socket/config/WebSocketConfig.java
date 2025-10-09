@@ -2,9 +2,11 @@ package WebSocket.socket.config;
 
 import WebSocket.socket.interceptor.StompHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -19,9 +21,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config){
         // 구독 prefix: /topic, /queue
-        config.enableSimpleBroker("/topic");
+        config.enableSimpleBroker("/topic")
+                .setHeartbeatValue(new long[]{10000, 10000}) // 10초
+                .setTaskScheduler(heartbeatScheduler());
         // 발행 prefix: /app
         config.setApplicationDestinationPrefixes("/app");
+
     }
 
     @Override
@@ -37,5 +42,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // 클라이언트로부터 들어오는 메시지 채널에 인증 인터셉터를 추가
         registration.interceptors(stompHandler);
         registration.taskExecutor().corePoolSize(4).maxPoolSize(8);
+    }
+
+    @Bean
+    public ThreadPoolTaskScheduler heartbeatScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(1);
+        scheduler.setThreadNamePrefix("wss-heartbeat-");
+        scheduler.initialize();
+        return scheduler;
     }
 }

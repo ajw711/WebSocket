@@ -1,5 +1,6 @@
 package WebSocket.socket.service;
 
+import WebSocket.socket.common.SessionManager;
 import WebSocket.socket.dto.MessageDto;
 import WebSocket.socket.entity.Chat;
 import WebSocket.socket.entity.Member;
@@ -16,6 +17,7 @@ public class ChatService {
     private final MemberRepository memberRepository;
     private final ChatRepository chatRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final SessionManager sessionManager;
 
     public void saveMessage(Long senderId, MessageDto messageDto) {
 
@@ -42,5 +44,11 @@ public class ChatService {
         // 브로드캐스트: /topic/room/{roomId} 경로를 구독하는 모든 클라이언트에게 전송
         String destination = "/topic/room/" + messageDto.getRoomId();
         messagingTemplate.convertAndSend(destination, broadcastDto);
+    }
+
+
+    // DisconnectSocket remove
+    public void removeUserSession(String sessionId) {
+        sessionManager.removeSession(sessionId);
     }
 }
