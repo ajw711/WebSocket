@@ -39,12 +39,14 @@ public class ChatService {
 
 
         chatRepository.save(chat);
+        String recordId = chatManager.chatSave(messageDto.getRoomId(), chat.getId(), senderId, messageDto.getMessage());
         chatManager.chatSave(messageDto.getRoomId(), chat.getId(), senderId, messageDto.getMessage());
 
         //  구독 클라이언트에게 메시지 브로드캐스트
         // 전송할 DTO를 새로 생성합니다. (클라이언트가 발신자 ID를 알 수 있도록)
         MessageResDto broadcastDto = MessageResDto.createMessage(
                 messageDto.getRoomId(),
+                recordId,
                 senderId, // Long 타입의 senderId를 DTO에 포함
                 messageDto.getMessage()
         );
@@ -54,35 +56,38 @@ public class ChatService {
         messagingTemplate.convertAndSend(destination, broadcastDto);
     }
 
+//    public void handleSubscribe(Long memberId, String roomId) {
+//
+//
+//        chatManager.joinConsumerGroup(roomId, memberId);
+//
+//
+//        List<MapRecord<String, Object, Object>> recentMessages = chatManager.joinConsumerGroup(roomId, memberId);
+//
+//        List<MessageResDto> messageDtos = recentMessages.stream()
+//                .map(record -> {
+//                    Map<Object, Object> value = record.getValue();
+//                    return MessageResDto.createMessage(
+//                            roomId,
+//                            Long.parseLong((String) value.get("senderId")),
+//                            (String) value.get("message")
+//                    );
+//                }).toList();
+//
+//        ReconnectResDto response = ReconnectResDto.of(messageDtos);
+//
+//        // 클라이언트 개인에게만 전달 (broadcast 아님)
+//        String userDestination = "/queue/reconnect/" + memberId;
+//        messagingTemplate.convertAndSendToUser(String.valueOf(memberId), userDestination, response );
+//    }
 
     // DisconnectSocket remove
-    public void markOffline(String memberId, String sessionId) {
+    public void deleteSession(String memberId, String sessionId) {
         sessionManager.deleteSession(sessionId);
     }
-    public void getMissedMessages(Long memberId, String roomId) {
 
-
-        List<MapRecord<String, Object, Object>> recentMessages = chatManager.getRecentMessage(roomId, 10);
-
-        List<MessageResDto> messageDtos = recentMessages.stream()
-                .map(record -> {
-                    Map<Object, Object> value = record.getValue();
-                    return MessageResDto.createMessage(
-                            roomId,
-                            Long.parseLong((String) value.get("senderId")),
-                            (String) value.get("message")
-                    );
-                }).toList();
-
-        ReconnectResDto response = ReconnectResDto.of(messageDtos);
-
-        // 클라이언트 개인에게만 전달 (broadcast 아님)
-        String userDestination = "/queue/reconnect/" + memberId;
-        messagingTemplate.convertAndSendToUser(String.valueOf(memberId), userDestination, response );
-    }
-
-    public void ackMessage(AckDto dto, Principal principal) {
-        chatManager.ackMessage(dto.getRoomId(), dto.getRecordId());
+    public void ackMessage(AckDto dto, Long memberId) {
+        chatManager.ackMessage(dto, memberId);
     }
 
     public void createConsumerGroupIfAbsent(String roomId) {

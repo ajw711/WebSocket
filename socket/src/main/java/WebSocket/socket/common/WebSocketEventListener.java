@@ -29,6 +29,6 @@ public class WebSocketEventListener {
 
         log.info("WebSocket 종료 감지, sessionId={}, user={}", sessionId, principal.getName());
 
-        chatService.markOffline(memberId, sessionId);
+        chatService.deleteSession(memberId, sessionId);
     }
 }
