@@ -1,5 +1,6 @@
 package WebSocket.socket.interceptor;
 
+import WebSocket.socket.common.ChatManager;
 import WebSocket.socket.common.SessionManager;
 import WebSocket.socket.entity.Member;
 import WebSocket.socket.jwt.JwtUtil;
@@ -32,7 +33,6 @@ public class StompHandler implements ChannelInterceptor {
     private final JwtUtil jwtUtil;
     private final SessionManager sessionManager;
     private final MemberRepository memberRepository;
-
 
     // 💡 메시지가 채널로 전송되기 전에 가로챕니다.
     @Override
@@ -77,6 +77,7 @@ public class StompHandler implements ChannelInterceptor {
 
                     // 세션 정보 추출
                     String sessionId = accessor.getSessionId();
+
                     sessionManager.saveSession(sessionId, memberId.toString());
 
                 } catch (JwtUtil.ExpiredTokenException | JwtUtil.NotValidTokenException e) {
@@ -91,6 +92,8 @@ public class StompHandler implements ChannelInterceptor {
                 log.warn("STOMP 연결 실패: Authorization 헤더 누락");
                 throw new RuntimeException("Authorization header required.");
             }
+        } else if(StompCommand.SUBSCRIBE.equals(accessor.getCommand())){
+
         }
 
         return message;

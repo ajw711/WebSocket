@@ -33,7 +33,8 @@ public class SecurityConfig {
 
     private static final String[] PERMIT_ALL_PATTERNS = {
             "/auth/login",
-            "/ws-chat/**"
+            "/ws-chat/**",
+            "/rooms"
     };
 
     @Bean

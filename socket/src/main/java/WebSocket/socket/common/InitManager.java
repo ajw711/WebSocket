@@ -12,6 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @Component // 1. Spring 빈으로 등록
 @RequiredArgsConstructor
@@ -29,14 +32,23 @@ public class InitManager {
 
         if (memberRepository.findByEmail("test@test.com").isEmpty()) {
 
-            Member newMember = Member.createMember(
+            Member newMember1 = Member.createMember(
                     "홍길동",
                     "test@test.com",
                     passwordEncoder.encode("1234"),
                     RoleType.USER
             );
 
-            memberRepository.save(newMember);
+            Member newMember2 = Member.createMember(
+                    "홍길동1",
+                    "test1@test.com",
+                    passwordEncoder.encode("12345"),
+                    RoleType.USER
+            );
+            List<Member> list = new ArrayList<>();
+            list.add(newMember1);
+            list.add(newMember2);
+            memberRepository.saveAll(list);
             log.info("초기 사용자 'test@test.com'가 성공적으로 생성되었습니다.");
         } else {
             log.info("초기 사용자 'test@test.com'가 이미 존재합니다.");

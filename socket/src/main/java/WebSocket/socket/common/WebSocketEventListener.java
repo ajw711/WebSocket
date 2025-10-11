@@ -25,8 +25,10 @@ public class WebSocketEventListener {
         String sessionId = accessor.getSessionId();
         Principal principal = accessor.getUser();
 
-        log.info("WebSocket 종료 감지, sessionId={}, user={}", sessionId, principal != null ? principal.getName() : null);
+        String memberId = principal.getName();
 
-        chatService.removeUserSession(sessionId);
+        log.info("WebSocket 종료 감지, sessionId={}, user={}", sessionId, principal.getName());
+
+        chatService.markOffline(memberId, sessionId);
     }
 }
