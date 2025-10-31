@@ -34,7 +34,7 @@ public class StompHandler implements ChannelInterceptor {
     private final SessionManager sessionManager;
     private final MemberRepository memberRepository;
 
-    // 💡 메시지가 채널로 전송되기 전에 가로챕니다.
+    // 메시지가 채널로 전송되기 전에 검사
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
 
